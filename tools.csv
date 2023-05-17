@@ -1,7 +1,7 @@
 Asset,Src,Dest,Config File,Repo,Prerequisite,Docker Pull,Command,Reference,Wordlist
 couchdb,/Tools/couchdb,/opt/couchdb,/opt/couchdb/data/local.ini,https://github.com/apache/couchdb,,"docker pull couchdb","docker run -p 5984:5984 -d couchdb",,
-bbrf,/Tools/bbrf,/opt/bbrf,/opt/bbrf/config.json,https://github.com/Cdaprod/cda.reconftw,sudo docker-compose up -d,"docker pull honoki/bbrf-server","docker run -it honoki/bbrf-server",,
-ReconFTW,/Tools/ReconFTW,/opt/reconftw,/opt/reconftw/config.yaml,https://github.com/honoki/bbrf-server,./install.sh,"docker pull six2dez/reconftw","docker run -it six2dez/reconftw",,
+bbrf,/Tools/bbrf,/opt/bbrf,/opt/bbrf/config.json,https://github.com/honoki/bbrf-server,sudo docker-compose up -d,"docker pull honoki/bbrf-server","docker run -it honoki/bbrf-server",,
+ReconFTW,/Tools/ReconFTW,/opt/reconftw,/opt/reconftw/config.yaml,https://github.com/six2dez/reconftw,./install.sh,"docker pull six2dez/reconftw","docker run -it six2dez/reconftw",,
 Amass,/Tools/Amass,/opt/amass,/opt/amass/config.ini,https://github.com/owasp-amass/amass,"docker pull caffix/amass","docker pull caffix/amass","docker run -v $HOME/.config/amass:/root/.config/amass -it caffix/amass enum -d http://example.com/",,
 Axiom,/Tools/Axiom,/opt/axiom,/opt/axiom/profiles.ini,https://github.com/pry0cc/axiom,bash <(curl -s https://raw.githubusercontent.com/pry0cc/axiom/master/interact/axiom-configure),,"docker exec -it $(docker run -d -it --platform linux/amd64 ubuntu) sh -c ""apt update && apt install git -y && git clone https://github.com/pry0cc/axiom ~/.axiom/ && cd && .axiom/interact/axiom-configure""",,
 Nuclei,/Tools/Nuclei,/opt/nuclei,/opt/nuclei/config.yaml,https://github.com/projectdiscovery/nuclei,"docker pull projectdiscovery/nuclei","docker pull projectdiscovery/nuclei","docker run -it projectdiscovery/nuclei",,
