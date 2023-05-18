@@ -1,6 +1,6 @@
 # Bash and CSV Script Tool Manager
 
-![Bash CSV Script Tool Manager](https://github.com/Cdaprod/Configure-Installations-with-Bash-CSV)
+![Bash CSV Script Tool Manager]([https://github.com/Cdaprod/Configure-Installations-with-Bash-CSV]
 
 Welcome to the Bash CSV Script Tool Manager! This powerful, dynamic utility helps automate the deployment and setup of your tools using an easy-to-manage CSV file. No more painstakingly installing each tool manually and configuring individual files. Streamline and standardize your tool deployment with our simple yet effective solution.
 
