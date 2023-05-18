@@ -1,60 +1,68 @@
 #!/bin/bash
 
-# Ensure the script is being run as root
-if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root"
-   exit 1
-fi
+# Read the CSV file
+INPUT=tools.csv
+OLDIFS=$IFS
+IFS=','
 
-# Make sure csv file exists
-csv_file="install.csv"
-if [ ! -f "$csv_file" ]; then
-    echo "$csv_file not found!"
-    exit 1
-fi
-
-# Read the CSV line by line
-tail -n +2 "$csv_file" | while IFS="," read -r asset src dest config_file repo prerequisite docker_pull command reference wordlist
-do
-    # Print current asset
-    echo "Processing $asset..."
-
-    # Check if Docker is installed, if not install it
-    if ! command -v docker &> /dev/null
-    then
-        echo "Docker could not be found. Installing Docker..."
-        apt-get update
-        apt-get install -y docker.io
-        systemctl start docker
-        systemctl enable docker
-    fi
-
-    # Check if Git is installed, if not install it
-    if ! command -v git &> /dev/null
-    then
-        echo "Git could not be found. Installing Git..."
-        apt-get update
-        apt-get install -y git
-    fi
-
-    # If Docker pull is provided, use Docker. Else, clone the repo directly into the system.
-    if [ ! -z "$docker_pull" ]; then
-        echo "Pulling Docker image for $asset..."
-        docker pull "$docker_pull"
+# Prompt function for No Config File
+prompt_no_config() {
+    echo "No configuration file detected for $1."
+    echo "Would you like to proceed without a configuration file? [y/N]"
+    read ans
+    if [[ $ans =~ ^[Yy]$ ]]; then
+        return 0
     else
-        echo "Cloning repo for $asset..."
-        git clone "$repo" "$src"
-        mv "$src" "$dest"
+        return 1
     fi
+}
 
-    # If prerequisites are provided, execute them
-    if [ ! -z "$prerequisite" ]; then
-        echo "Processing prerequisites for $asset..."
-        eval "$prerequisite"
-    fi
+# Check if file exists
+if [ ! -f $INPUT ]; then
+    echo "$INPUT : File not found!"
+else
+    while read Asset Src Dest Config Repo Prerequisite DockerPull Command Reference Wordlist
+    do
+        echo "Processing $Asset..."
 
-    echo "$asset installed successfully."
+        # Handle prerequisites
+        if [ -n "$Prerequisite" ]; then
+            echo "Handling prerequisites for $Asset..."
+            eval "$Prerequisite"
+        fi
 
-done
+        # Clone from repo
+        echo "Cloning $Asset from $Repo..."
+        git clone $Repo $Src
 
-echo "All tools installed successfully!"
+        # Check config file
+        if [ -z "$Config" ]; then
+            prompt_no_config $Asset
+            if [ $? -eq 1 ]; then
+                echo "Skipping $Asset due to missing configuration file."
+                continue
+            fi
+        else
+            echo "Moving configuration file to $Config..."
+            mv $Src/$Config $Dest
+        fi
+
+        # Pull docker image if specified
+        if [ -n "$DockerPull" ]; then
+            echo "Pulling Docker image for $Asset..."
+            docker pull $DockerPull
+        fi
+
+        # Run docker command if specified
+        if [ -n "$Command" ]; then
+            echo "Running Docker command for $Asset..."
+            eval "$Command"
+        fi
+
+        echo "$Asset installation completed."
+
+    done < $INPUT
+fi
+
+IFS=$OLDIFS
+echo "Script execution completed."
